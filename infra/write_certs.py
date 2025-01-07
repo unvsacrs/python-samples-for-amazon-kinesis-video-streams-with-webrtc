@@ -31,7 +31,7 @@ def get_iot_credential_provider_endpoint():
     response = iot_client.describe_endpoint(endpointType='iot:CredentialProvider')
     return response['endpointAddress']
 
-def create_env_file(output_dir, iot_credential_provider, thing_name, 
+def create_env_file(output_dir, iot_credential_provider, thing_name,
                     role_alias, cert_file, key_file, root_ca,
                     signaling_channel_arn, signaling_channel_name,
                     aws_default_region):
@@ -62,7 +62,7 @@ def main():
     signaling_channel_arn = get_stack_output(stack_name, "SignalingChannelArn")
     signaling_channel_name = get_stack_output(stack_name, "SignalingChannelName")
     aws_default_region = os.environ.get('AWS_DEFAULT_REGION', 'us-west-2')
-    
+
     if certificate_pem and private_key and role_alias:
         KvsWebRtcStack.write_certificate_files(output_dir, certificate_pem, private_key)
         # Download the AWS IoT Root CA

@@ -71,18 +71,18 @@ class KinesisVideoClient:
         self.credentials = credentials
         self.media_manager = MediaTrackManager(file_path)
         if self.credentials:
-            self.kinesisvideo = boto3.client('kinesisvideo', 
-                                             region_name=self.region, 
+            self.kinesisvideo = boto3.client('kinesisvideo',
+                                             region_name=self.region,
                                              aws_access_key_id=self.credentials['accessKeyId'],
                                              aws_secret_access_key=self.credentials['secretAccessKey'],
                                              aws_session_token=self.credentials['sessionToken']
-                                            )
+                                             )
         else:
             self.kinesisvideo = boto3.client('kinesisvideo', region_name=self.region)
         self.endpoints = None
         self.endpoint_https = None
         self.endpoint_wss = None
-        self.ice_servers = None 
+        self.ice_servers = None
         self.PCMap = {}
         self.DCMap = {}
 
@@ -98,7 +98,7 @@ class KinesisVideoClient:
             }
             self.endpoint_https = self.endpoints['HTTPS']
             self.endpoint_wss = self.endpoints['WSS']
-        return self.endpoints            
+        return self.endpoints
 
     def prepare_ice_servers(self):
         if self.credentials:
@@ -108,11 +108,11 @@ class KinesisVideoClient:
                                                    aws_access_key_id=self.credentials['accessKeyId'],
                                                    aws_secret_access_key=self.credentials['secretAccessKey'],
                                                    aws_session_token=self.credentials['sessionToken']
-                                                 )
+                                                   )
         else:
             kinesis_video_signaling = boto3.client('kinesis-video-signaling',
-                                                endpoint_url=self.endpoint_https,
-                                                region_name=self.region)
+                                                   endpoint_url=self.endpoint_https,
+                                                   region_name=self.region)
         ice_server_config = kinesis_video_signaling.get_ice_server_config(
             ChannelARN=self.channel_arn,
             ClientId='MASTER'
@@ -207,7 +207,7 @@ class KinesisVideoClient:
                         except Exception as e:
                             print(f"Error sending message: {e}")
                     else:
-                         print(f"Data channel {i} is not open. Current state: {self.DCMap[i].readyState}")
+                        print(f"Data channel {i} is not open. Current state: {self.DCMap[i].readyState}")
                 print(f'[{channel.label}] datachannel_message: {dc_message}')
 
         if audio_track:
@@ -231,7 +231,7 @@ class KinesisVideoClient:
 
     async def signaling_client(self):
         audio_track, video_track = self.media_manager.create_media_track()
-        self.get_signaling_channel_endpoint() 
+        self.get_signaling_channel_endpoint()
         wss_url = self.create_wss_url()
 
         while True:
@@ -251,7 +251,7 @@ class KinesisVideoClient:
 
 
 class IoTCredentialProvider:
-    def __init__(self, endpoint: str, region: str, thing_name: str, role_alias: str, 
+    def __init__(self, endpoint: str, region: str, thing_name: str, role_alias: str,
                  cert_path: str, key_path: str, root_ca_path: str):
         self.endpoint = endpoint
         self.region = region
@@ -286,11 +286,11 @@ class IoTCredentialProvider:
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
             return None
-        
+
 
 async def run_client(client):
     await client.signaling_client()
-    
+
 async def main():
     parser = argparse.ArgumentParser(description='Kinesis Video Streams WebRTC Client')
     parser.add_argument('--channel-arn', type=str, required=True, help='the ARN of the signaling channel')
@@ -324,7 +324,7 @@ async def main():
         credentials=credentials,
         file_path=args.file_path
     )
-    
+
     await run_client(client)
 
 if __name__ == '__main__':

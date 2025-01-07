@@ -77,7 +77,7 @@ class SimpleVideoTrack(MediaStreamTrack):
             self.frame_count += 1
             current_time = time.time()
             fps = 1 / (current_time - self.last_frame_time) if self.frame_count > 1 else 0
-            self.last_frame_time = current_time            
+            self.last_frame_time = current_time
             logging.debug(f"Simple: Received frame {self.frame_count} (FPS: {fps:.2f})")
 
             img = frame.to_ndarray(format="bgr24")
@@ -129,12 +129,12 @@ class KinesisVideoClient:
         self.credentials = credentials
         self.media_manager = MediaTrackManager(file_path)
         if self.credentials:
-            self.kinesisvideo = boto3.client('kinesisvideo', 
-                                             region_name=self.region, 
+            self.kinesisvideo = boto3.client('kinesisvideo',
+                                             region_name=self.region,
                                              aws_access_key_id=self.credentials['accessKeyId'],
                                              aws_secret_access_key=self.credentials['secretAccessKey'],
                                              aws_session_token=self.credentials['sessionToken']
-                                            )
+                                             )
         else:
             self.kinesisvideo = boto3.client('kinesisvideo', region_name=self.region)
         self.endpoints = None
@@ -144,7 +144,7 @@ class KinesisVideoClient:
         self.video_handler = video_handler
         self.pc = None
 
-    def get_signaling_channel_endpoint(self): 
+    def get_signaling_channel_endpoint(self):
         if self.endpoints is None:  # Check if endpoints are already fetched
             endpoints = self.kinesisvideo.get_signaling_channel_endpoint(
                 ChannelARN=self.channel_arn,
@@ -156,7 +156,7 @@ class KinesisVideoClient:
             }
             self.endpoint_https = self.endpoints['HTTPS']
             self.endpoint_wss = self.endpoints['WSS']
-        return self.endpoints            
+        return self.endpoints
 
     def prepare_ice_servers(self):
         if self.credentials:
@@ -166,11 +166,11 @@ class KinesisVideoClient:
                                                    aws_access_key_id=self.credentials['accessKeyId'],
                                                    aws_secret_access_key=self.credentials['secretAccessKey'],
                                                    aws_session_token=self.credentials['sessionToken']
-                                                 )
+                                                   )
         else:
             kinesis_video_signaling = boto3.client('kinesis-video-signaling',
-                                                endpoint_url=self.endpoint_https,
-                                                region_name=self.region)
+                                                   endpoint_url=self.endpoint_https,
+                                                   region_name=self.region)
         ice_server_config = kinesis_video_signaling.get_ice_server_config(
             ChannelARN=self.channel_arn,
             ClientId=self.client_id
@@ -245,7 +245,7 @@ class KinesisVideoClient:
         def on_track(track):
             logging.info(f"Received track: {track.kind}")
             if track.kind == "video":
-                # when a new video track is received from the remote peer, 
+                # when a new video track is received from the remote peer,
                 # an instance of SimpleVideoTrack is created by passing the received track object to its constructor.
                 # This instance ( local_video ) is then added to the peer connection using pc.addTrack(local_video).
                 local_video = SimpleVideoTrack(track, self.video_handler)
@@ -272,7 +272,7 @@ class KinesisVideoClient:
 
         offer = await self.pc.createOffer()
         await self.pc.setLocalDescription(offer)
-        
+
         await websocket.send(self.encode_msg('SDP_OFFER', {'sdp': self.pc.localDescription.sdp, 'type': self.pc.localDescription.type}, self.client_id))
 
     async def handle_ice_candidate(self, payload):
@@ -323,7 +323,7 @@ class KinesisVideoClient:
 
 
 class IoTCredentialProvider:
-    def __init__(self, endpoint: str, region: str, thing_name: str, role_alias: str, 
+    def __init__(self, endpoint: str, region: str, thing_name: str, role_alias: str,
                  cert_path: str, key_path: str, root_ca_path: str):
         self.endpoint = endpoint
         self.region = region
@@ -358,7 +358,7 @@ class IoTCredentialProvider:
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
             return None
-        
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -391,11 +391,11 @@ def main():
     # Start the WebRTC connection in a separate thread
     webrtc_thread = threading.Thread(target=lambda: asyncio.run(
         KinesisVideoClient(
-            client_id="VIEWER", 
-            region=AWS_DEFAULT_REGION, 
-            channel_arn=args.channel_arn, 
+            client_id="VIEWER",
+            region=AWS_DEFAULT_REGION,
+            channel_arn=args.channel_arn,
             credentials=credentials,
-            video_handler=video_handler, 
+            video_handler=video_handler,
             file_path=args.file_path
         ).signaling_client()))
     webrtc_thread.start()

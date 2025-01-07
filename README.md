@@ -92,7 +92,7 @@ If you have not already set up the AWS CLI on the PC for operation, follow the s
   python script/getTemporaryCredentialsAWSCli.py
   ```
 
-  output
+output
   ```bash
   This is the temporary credential valid for 43199 seconds.
   Paste them in your shell!
@@ -102,7 +102,7 @@ If you have not already set up the AWS CLI on the PC for operation, follow the s
   export AWS_SESSION_TOKEN=FXXXXXXXXXXXXXXXX0
   export AWS_DEFAULT_REGION=usXXXX2
   ```  
-1. Execute the copied output to the terminal of the machine where you want to 
+1. Execute the copied output to the terminal of the machine where you want to
   ```bash
   export AWS_ACCESS_KEY_ID=AXXXXXXXXXXXXX7
   export AWS_SECRET_ACCESS_KEY=fXXXXXXXXXXXXXXXX4
@@ -118,11 +118,11 @@ If you have not already set up the AWS CLI on the PC for operation, follow the s
 1. Upload getTemporaryCredentialsCloudShell.py to CloudShell
 1. Run getTemporaryCredentialsCloudShell.py retrieve temporary credentials from AWS_CONTAINER_CREDENTIALS_FULL_URI
 
-    **In your CloudShell**
+   **In your CloudShell**
     ```bash
     python getTemporaryCredentialsCloudShell.py
     ```
-    output
+   output
     ```bash
     This is the temporary credential valid for 43199 seconds.
     Paste them in your shell!
@@ -132,9 +132,9 @@ If you have not already set up the AWS CLI on the PC for operation, follow the s
     export AWS_SESSION_TOKEN=FXXXXXXXXXXXXXXXX0
     export AWS_DEFAULT_REGION=usXXXX2
     ```
-1. Execute the copied output to the terminal of the machine where you want to 
+1. Execute the copied output to the terminal of the machine where you want to
 
-    **In your device or local terminal**
+   **In your device or local terminal**
     ```bash
     export AWS_ACCESS_KEY_ID=AXXXXXXXXXXXXX7
     export AWS_SECRET_ACCESS_KEY=fXXXXXXXXXXXXXXXX4
@@ -158,7 +158,7 @@ If you have not already set up the AWS CLI on the PC for operation, follow the s
 1. Upload infra.zip to CloudShell
 1. unzip infra.zip
 
-    **In your CloudShell**
+   **In your CloudShell**
     ```bash
     unzip infra.zip
     ```
@@ -203,7 +203,7 @@ If you have not already set up the AWS CLI on the PC for operation, follow the s
     ls -a script-output
     ```
 
-    output
+   output
     ```bash
     .  ..  device.cert.pem  device.private.key  .env  rootca.pem
     ```  
@@ -212,9 +212,9 @@ If you have not already set up the AWS CLI on the PC for operation, follow the s
     zip -r script-output.zip script-output
     ```
 1. Download script-output.zip to local infra folder
-    - Individual file path: `infra/script-output.zip` 
+    - Individual file path: `infra/script-output.zip`
 1. unzip script-output.zip in infra folder
-    **In your device or local terminal**
+   **In your device or local terminal**
 
     ```bash
     cd infra
@@ -222,7 +222,7 @@ If you have not already set up the AWS CLI on the PC for operation, follow the s
     ls -a script-output
     ```
 
-    output
+   output
     ```bash
     .   ..   .env   device.cert.pem    device.private.key    rootca.pem
     ```  
@@ -236,14 +236,14 @@ This step creates a signaling channel for the WebRTC Master and Viewer.
 1. Start CloudShell
 1. If a channel has already been created, check the ARN value for that channel by running the following command.
     ```bash
-    aws kinesisvideo describe-signaling-channel --channel-name kvs-demo-channel --region AWS_DEFAULT_REGION
+    aws kinesisvideo describe-signaling-channel --channel-name kvs-demo-channel --region $AWS_DEFAULT_REGION
     ```
 1. Create a signaling channel for the WebRTC Master and Viewer.
     ```bash
-    aws kinesisvideo create-signaling-channel --channel-name kvs-demo-channel --region AWS_DEFAULT_REGION
+    aws kinesisvideo create-signaling-channel --channel-name kvs-demo-channel --region $AWS_DEFAULT_REGION
     ```
 
-We will use the channel ARN information returned by executing the above command in the next step. 
+We will use the channel ARN information returned by executing the above command in the next step.
 
 ## Samples
 
@@ -305,13 +305,13 @@ To experiment with the WebRTC aspects of this project, you can use the [Kinesis 
 #### Setup Instructions
 1. Navigate to the KVS WebRTC Test Page
 2. Enter the following details:
-   - Region: [REGION_NAME] (where your signaling channel is created)
-   - Access Key ID: [AWS_ACCESS_KEY_ID]
-   - Secret Access Key: [AWS_SECRET_ACCESS_KEY]
-   - Session Token: [AWS_SESSION_TOKEN]
-   - Channel Name: **kvs-demo-channel** (must match the signaling channel used by the master or viewer)
+    - Region: [REGION_NAME] (where your signaling channel is created)
+    - Access Key ID: [AWS_ACCESS_KEY_ID]
+    - Secret Access Key: [AWS_SECRET_ACCESS_KEY]
+    - Session Token: [AWS_SESSION_TOKEN]
+    - Channel Name: **kvs-demo-channel** (must match the signaling channel used by the master or viewer)
 
-    ![](./docs/images/KVS-WebRTC-Test-Page-Input.png)
+   ![](./docs/images/KVS-WebRTC-Test-Page-Input.png)
 
 #### Viewing Results
 
@@ -321,11 +321,11 @@ To experiment with the WebRTC aspects of this project, you can use the [Kinesis 
 
 ##### Testing the Viewer Script
 1. Start a master on the Kinesis Video Streams WebRTC Test Page.
-   - Note: Always start the master before the viewer.
+    - Note: Always start the master before the viewer.
 1. Run the kvsWebRTCClientViewer.py script.
-  
-    These steps allow you to test both the master and viewer functionalities of your WebRTC application using the Kinesis Video Streams test page and your Python scripts.
-    ![](./docs/images/KVS-WebRTC-Test-Page-Result.png)
+
+   These steps allow you to test both the master and viewer functionalities of your WebRTC application using the Kinesis Video Streams test page and your Python scripts.
+   ![](./docs/images/KVS-WebRTC-Test-Page-Result.png)
 
 ## Architecture Diagram
 

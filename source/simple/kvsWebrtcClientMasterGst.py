@@ -1,8 +1,8 @@
 import argparse
 import asyncio
-import json 
-import numpy as np 
-import boto3 
+import json
+import numpy as np
+import boto3
 import websockets
 from aiortc import RTCConfiguration, RTCIceServer, RTCPeerConnection, RTCSessionDescription, MediaStreamTrack
 from aiortc.contrib.media import MediaBlackhole
@@ -14,7 +14,7 @@ from botocore.awsrequest import AWSRequest
 from botocore.credentials import Credentials
 from botocore.session import Session
 from fractions import Fraction
-import gi 
+import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstVideo', '1.0')
 from gi.repository import Gst, GstVideo, GLib
@@ -62,9 +62,9 @@ def get_np_dtype(video_format):
         raise ValueError(f"Unsupported video format: {video_format}")
 
 
-class GstreamerPipeline: 
-    def __init__(self, pipeline_str): 
-        Gst.init(None) 
+class GstreamerPipeline:
+    def __init__(self, pipeline_str):
+        Gst.init(None)
         try:
             self.pipeline = Gst.parse_launch(pipeline_str)
             # Start playing
@@ -79,11 +79,11 @@ class GstreamerPipeline:
             print(f"Error: {e}")
             return
 
-        self.video_sink = self.pipeline.get_by_name('appsink-video') 
-        self.audio_sink = self.pipeline.get_by_name('appsink-audio') 
-        self.video_track = None 
-        self.audio_track = None 
-        
+        self.video_sink = self.pipeline.get_by_name('appsink-video')
+        self.audio_sink = self.pipeline.get_by_name('appsink-audio')
+        self.video_track = None
+        self.audio_track = None
+
         if not (self.video_sink or self.audio_sink):
             raise ValueError("Pipeline must contain at least one appsink named 'appsink-video' or 'appsink-audio'")
 
@@ -153,18 +153,18 @@ class KinesisVideoClient:
         self.video_track = self.media_manager.video_track
         self.audio_track = self.media_manager.audio_track
         if self.credentials:
-            self.kinesisvideo = boto3.client('kinesisvideo', 
-                                             region_name=self.region, 
+            self.kinesisvideo = boto3.client('kinesisvideo',
+                                             region_name=self.region,
                                              aws_access_key_id=self.credentials['accessKeyId'],
                                              aws_secret_access_key=self.credentials['secretAccessKey'],
                                              aws_session_token=self.credentials['sessionToken']
-                                            )
+                                             )
         else:
             self.kinesisvideo = boto3.client('kinesisvideo', region_name=self.region)
         self.endpoints = None
         self.endpoint_https = None
         self.endpoint_wss = None
-        self.ice_servers = None 
+        self.ice_servers = None
         self.PCMap = {}
         self.DCMap = {}
 
@@ -180,7 +180,7 @@ class KinesisVideoClient:
             }
             self.endpoint_https = self.endpoints['HTTPS']
             self.endpoint_wss = self.endpoints['WSS']
-        return self.endpoints            
+        return self.endpoints
 
     def prepare_ice_servers(self):
         if self.credentials:
@@ -190,11 +190,11 @@ class KinesisVideoClient:
                                                    aws_access_key_id=self.credentials['accessKeyId'],
                                                    aws_secret_access_key=self.credentials['secretAccessKey'],
                                                    aws_session_token=self.credentials['sessionToken']
-                                                 )
+                                                   )
         else:
             kinesis_video_signaling = boto3.client('kinesis-video-signaling',
-                                                endpoint_url=self.endpoint_https,
-                                                region_name=self.region)
+                                                   endpoint_url=self.endpoint_https,
+                                                   region_name=self.region)
         ice_server_config = kinesis_video_signaling.get_ice_server_config(
             ChannelARN=self.channel_arn,
             ClientId='MASTER'
@@ -289,7 +289,7 @@ class KinesisVideoClient:
                         except Exception as e:
                             print(f"Error sending message: {e}")
                     else:
-                         print(f"Data channel {i} is not open. Current state: {self.DCMap[i].readyState}")
+                        print(f"Data channel {i} is not open. Current state: {self.DCMap[i].readyState}")
                 print(f'[{channel.label}] datachannel_message: {dc_message}')
 
         if audio_track:
@@ -298,7 +298,7 @@ class KinesisVideoClient:
         if video_track:
             print(f'[handle_sdp_offer] Adding video track: {video_track.kind}')
             self.PCMap[client_id].addTrack(video_track)
-            
+
         await self.PCMap[client_id].setRemoteDescription(RTCSessionDescription(
             sdp=payload['sdp'],
             type=payload['type']
@@ -315,7 +315,7 @@ class KinesisVideoClient:
             await self.PCMap[client_id].addIceCandidate(candidate)
 
     async def signaling_client(self):
-        self.get_signaling_channel_endpoint() 
+        self.get_signaling_channel_endpoint()
         wss_url = self.create_wss_url()
 
         while True:
@@ -335,7 +335,7 @@ class KinesisVideoClient:
 
 
 class IoTCredentialProvider:
-    def __init__(self, endpoint: str, region: str, thing_name: str, role_alias: str, 
+    def __init__(self, endpoint: str, region: str, thing_name: str, role_alias: str,
                  cert_path: str, key_path: str, root_ca_path: str):
         self.endpoint = endpoint
         self.region = region
@@ -370,7 +370,7 @@ class IoTCredentialProvider:
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
             return None
-        
+
 
 async def run_client(client):
     try:
@@ -432,5 +432,5 @@ async def main():
         print(f"Error: {e}")
         return
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     asyncio.run(main())
