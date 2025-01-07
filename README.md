@@ -4,30 +4,33 @@ The python-samples-for-amazon-kinesis-video-streams-with-webrtc repository provi
 
 ## Table of Contents
 
-- [Getting started](#getting-started)
-  - [Clone the repo and install python dependencies](#clone-the-repo-and-install-python-dependencies)
-  - [Install GStreamer and Dependencies (optional)](#install-gstreamer-and-dependencies-optional)
-    - [Ubuntu](#ubuntu)
-    - [macOS](#macos)
-- [Set credentials](#set-credentials)
-  - [Option 1: Temporary credentials using AWS CLI](#option-1-temporary-credentials-using-aws-cli)
-  - [Option 2: Temporary credentials using CloudShell](#option-2-temporary-credentials-using-cloudshell)
-  - [Option 3: IoT Device Certificate](#option-3-iot-device-certificate)
-  - [Configure Kinesis Video Streams WebRTC Signaling Channel](#configure-kinesis-video-streams-webrtc-signaling-channel)
-- [Samples](#samples)
-  - [kvsWebRTCClientMaster](#kvswebrtcclientmaster)
-  - [kvsWebRTCClientViewer](#kvswebrtcclientviewer)
-  - [kvsWebrtcClientMasterGst](#kvswebrtcclientmastergst)
-  - [app-master-infer-self](#app-master-infer-self)
-  - [Testing WebRTC with Kinesis Video Streams](#testing-webrtc-with-kinesis-video-streams)
-    - [Setup Instructions](#setup-instructions)
-    - [Viewing Results](#viewing-results)
-      - [Testing the Master Script](#testing-the-master-script)
-      - [Testing the Viewer Script](#testing-the-viewer-script)
-- [Architecture Diagram](#architecture-diagram)
-  - [Simple](#simple)
-  - [yolo8](#yolo8)
-- [Disclaimers](#disclaimers)
+- [python-samples-for-amazon-kinesis-video-streams-with-webrtc](#python-samples-for-amazon-kinesis-video-streams-with-webrtc)
+    - [Table of Contents](#table-of-contents)
+    - [Getting started](#getting-started)
+        - [Clone the repo and install python dependencies](#clone-the-repo-and-install-python-dependencies)
+        - [Install GStreamer and Dependencies (optional)](#install-gstreamer-and-dependencies-optional)
+            - [Ubuntu](#ubuntu)
+            - [macOS](#macos)
+    - [Set credentials](#set-credentials)
+        - [Option 1: Temporary credentials using AWS CLI](#option-1-temporary-credentials-using-aws-cli)
+        - [Option 2: Temporary credentials using CloudShell](#option-2-temporary-credentials-using-cloudshell)
+        - [Option 3: IoT Device Certificate](#option-3-iot-device-certificate)
+        - [Configure Kinesis Video Streams WebRTC Signaling Channel](#configure-kinesis-video-streams-webrtc-signaling-channel)
+    - [Samples](#samples)
+        - [kvsWebRTCClientMaster](#kvswebrtcclientmaster)
+        - [kvsWebRTCClientViewer](#kvswebrtcclientviewer)
+        - [kvsWebRTCClientMasterGst](#kvswebrtcclientmastergst)
+        - [kvsWebRTCClientMasterGstPlugin](#kvswebrtcclientmastergstplugin)
+        - [app-master-infer-self](#app-master-infer-self)
+        - [Testing WebRTC with Kinesis Video Streams](#testing-webrtc-with-kinesis-video-streams)
+            - [Setup Instructions](#setup-instructions)
+            - [Viewing Results](#viewing-results)
+                - [Testing the Master Script](#testing-the-master-script)
+                - [Testing the Viewer Script](#testing-the-viewer-script)
+    - [Architecture Diagram](#architecture-diagram)
+        - [Simple](#simple)
+        - [yolo8](#yolo8)
+    - [Disclaimers](#disclaimers)
 
 ## Getting started
 
@@ -78,7 +81,9 @@ export GST_PLUGIN_SCANNER=/usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/g
 
 #### macOS
 ```bash
-brew install gstreamer
+brew install gstreamer ffmpeg pygobject3 gtk+3 gobject-introspection libnice-gstreamer
+
+export GST_PLUGIN_PATH="$(brew --prefix libnice-gstreamer)/libexec/gstreamer-1.0:$GST_PLUGIN_PATH"
 ```
 
 ## Set credentials
@@ -247,12 +252,13 @@ We will use the channel ARN information returned by executing the above command 
 
 ## Samples
 
-| Directory | File                        | Description                                                                                                   |
-|-----------|-----------------------------|---------------------------------------------------------------------------------------------------------------|
-| simple    | kvsWebRTCClientMaster.py    | Master client for KVS WebRTC: Manages media tracks and signaling, supporting various OS inputs via aiortc.    |
-| simple    | kvsWebRTCClientViewer.py    | Viewer client for KVS WebRTC: Handles media tracks and signaling, compatible with multiple OS through aiortc. |
-| simple    | kvsWebrtcClientMasterGst.py | Master client for KVS WebRTC: Utilizes GStreamer for advanced media processing and conversion.                |
-| ml/yolov8 | app-master-infer-self.py    | Master client for KVS WebRTC: Offers optional YOLO object detection for real-time processing.                 |
+| Directory | File                              | Description                                                                                                   |
+|-----------|-----------------------------------|---------------------------------------------------------------------------------------------------------------|
+| simple    | kvsWebRTCClientMaster.py          | Master client for KVS WebRTC: Manages media tracks and signaling, supporting various OS inputs via aiortc.    |
+| simple    | kvsWebRTCClientViewer.py          | Viewer client for KVS WebRTC: Handles media tracks and signaling, compatible with multiple OS through aiortc. |
+| simple    | kvsWebRTCClientMasterGst.py       | Master client for KVS WebRTC: Utilizes GStreamer for advanced media processing and conversion.                |
+| simple    | kvsWebRTCClientMasterGstPlugin.py | Master client for KVS WebRTC: Utilizes awskvswebrtcsink plugin for GStreamer.                                 |
+| ml/yolov8 | app-master-infer-self.py          | Master client for KVS WebRTC: Offers optional YOLO object detection for real-time processing.                 |
 
 
 ### kvsWebRTCClientMaster
@@ -277,10 +283,28 @@ Use camera as a media source
 python source/simple/kvsWebRTCClientViewer.py --channel-arn arn:aws:kinesisvideo:[region]:[account-number]:channel/[channel-name]/[number]
 ```
 
-### kvsWebrtcClientMasterGst
+### kvsWebRTCClientMasterGst
 ```bash
-python source/simple/kvsWebrtcClientMasterGst.py --channel-arn arn:aws:kinesisvideo:[region]:[account-number]:channel/[channel-name]/[number] 
+python source/simple/kvsWebRTCClientMasterGst.py --channel-arn arn:aws:kinesisvideo:[region]:[account-number]:channel/[channel-name]/[number] 
 ```
+
+### kvsWebRTCClientMasterGstPlugin
+This script utilizes the awskvswebrtcsink plugin for GStreamer to send video streams to Amazon Kinesis Video Streams with WebRTC.
+
+**Usage**:
+```bash
+python source/simple/kvsWebRTCClientMasterGstPlugin.py --pipeline "<GStreamer pipeline>"
+```
+
+**Example**:
+```bash
+python source/simple/kvsWebRTCClientMasterGstPlugin.py --pipeline "autovideosrc ! video/x-raw,width=1280,height=720 ! videoconvert ! textoverlay text=\"Hello from GStreamer\" ! videoconvert ! awskvswebrtcsink name=ws signaller::channel-name=[channel-name]"
+```
+Notes:
+- The GStreamer pipeline should be customized based on your video source and processing requirements.
+- Replace [channel-name] with your actual Kinesis Video Stream channel name.
+- Adjust video resolution (width and height) as needed for your use case.
+- You can modify or remove the textoverlay element to customize on-screen text.
 
 ### app-master-infer-self
 Use video file as a media source
