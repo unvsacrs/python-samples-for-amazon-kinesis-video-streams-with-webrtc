@@ -5,7 +5,7 @@ websockets==13.0.1
 # for GStreamer
 pyproj
 pycairo>=1.27.0
-PyGObject>=3.50.0
+#PyGObject>=3.50.0
 # for openvino compatibility
 numpy<=1.26.4
 # for Viewer
