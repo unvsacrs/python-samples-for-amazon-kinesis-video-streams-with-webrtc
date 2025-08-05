@@ -36,3 +36,4 @@ cdk.out/
 infra.zip
 models/
 *.pt
+myenv*

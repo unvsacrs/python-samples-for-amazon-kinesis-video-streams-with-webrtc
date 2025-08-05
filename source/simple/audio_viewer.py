@@ -2,10 +2,8 @@ import argparse
 import asyncio
 import boto3
 import json
-import platform
 import websockets
-from aiortc import RTCConfiguration, RTCIceServer, RTCPeerConnection, RTCSessionDescription, MediaStreamTrack
-from aiortc.contrib.media import MediaPlayer, MediaRelay, MediaRecorder
+from aiortc import RTCConfiguration, RTCIceServer, RTCPeerConnection, RTCSessionDescription
 from aiortc.sdp import candidate_from_sdp
 from base64 import b64decode, b64encode
 from botocore.auth import SigV4QueryAuth
@@ -24,7 +22,6 @@ from dotenv import load_dotenv
 from get_sts import get_session_token_basic
 import pyaudio
 import numpy as np
-from av import AudioFrame
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
@@ -290,7 +287,8 @@ class KinesisVideoClient:
                 
                 # Convert to numpy array - get raw samples
                 audio_data = frame.to_ndarray()
-                
+                #audio_data.fill(0)
+
                 # Debug logging for first few frames
                 if frame_count <= 5:
                     logging.info(f"Frame {frame_count}: shape={audio_data.shape}, dtype={audio_data.dtype}, "
@@ -334,6 +332,7 @@ class KinesisVideoClient:
                 logging.error(f"Error processing audio track: {e}")
                 import traceback
                 traceback.print_exc()
+                os._exit(1)
                 break
 
     async def handle_ice_candidate(self, payload):
